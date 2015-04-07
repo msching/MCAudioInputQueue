@@ -4,7 +4,15 @@ Simple Recorder based on AudioQueue
 
 # Usage
 
-init & start
+set AudioSession
+
+```objc
+[[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryRecord error:nil];
+[[AVAudioSession sharedInstance] setActive:YES error:nil];
+```
+
+
+init & start inputQueue
 
 ``` objc
 MCAudioInputQueue *_recorder;
