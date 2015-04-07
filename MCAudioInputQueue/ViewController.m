@@ -144,7 +144,7 @@
     _started = YES;
     
     _data = [NSMutableData data];
-    _recorder = [[MCAudioInputQueue alloc] initWithFormat:_format bufferDuration:1 delegate:self];
+    _recorder = [[MCAudioInputQueue alloc] initWithFormat:_format bufferDuration:0.2 delegate:self];
     [_recorder start];
     
     [self _refreshUI];
@@ -158,6 +158,9 @@
     }
     
     _started = NO;
+    
+    [_recorder stop];
+    _recorder = nil;
     
     [self _refreshUI];
 }
