@@ -36,7 +36,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self)
     {
-        [self commonInit];
+        [self _commonInit];
     }
     return self;
 }
@@ -45,10 +45,10 @@
 {
     [super awakeFromNib];
     
-    [self commonInit];
+    [self _commonInit];
 }
 
-- (void)commonInit
+- (void)_commonInit
 {
     if (_inited)
     {
