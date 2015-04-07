@@ -133,6 +133,7 @@ static const NSTimeInterval bufferDuration = 0.2;
 #pragma mark - play
 - (void)_play
 {
+    [_player stop];
     _player = [[AVAudioPlayer alloc] initWithPcmData:_data pcmFormat:_format error:nil];
     [_player play];
 }
