@@ -11,6 +11,8 @@
 #import "AVAudioPlayer+PCM.h"
 #import <AVFoundation/AVAudioSession.h>
 
+static const NSTimeInterval bufferDuration = 0.2;
+
 @interface ViewController ()<MCAudioInputQueueDelegate>
 {
 @private
@@ -147,7 +149,7 @@
     _started = YES;
     
     _data = [NSMutableData data];
-    _recorder = [MCAudioInputQueue inputQueueWithFormat:_format bufferDuration:0.2 delegate:self];
+    _recorder = [MCAudioInputQueue inputQueueWithFormat:_format bufferDuration:bufferDuration delegate:self];
     [_recorder start];
     
     [self _refreshUI];
@@ -186,7 +188,8 @@
     double duration = _data.length / _recorder.bufferSize * _recorder.bufferDuration;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.durationLabel.text = [NSString stringWithFormat:@"duration = %.2lf",duration];
+        NSString *durationString = [NSString stringWithFormat:@"duration = %.1lfs",duration];
+        self.durationLabel.text = durationString;
     });
 }
 
