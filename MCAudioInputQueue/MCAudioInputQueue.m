@@ -7,7 +7,6 @@
 //
 
 #import "MCAudioInputQueue.h"
-#import <pthread.h>
 
 const int MCAudioQueueBufferCount = 3;
 
