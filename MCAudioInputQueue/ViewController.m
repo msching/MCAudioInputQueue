@@ -67,7 +67,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_interrupted:) name:AVAudioSessionInterruptionNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_interrupted:) name:AVAudioSessionRouteChangeNotification object:nil];
     
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
 }
 
