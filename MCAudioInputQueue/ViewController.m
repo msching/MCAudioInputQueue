@@ -14,8 +14,10 @@
 @interface ViewController ()<MCAudioInputQueueDelegate>
 {
 @private
-    MCAudioInputQueue *_recorder;
     AudioStreamBasicDescription _format;
+    BOOL _inited;
+    
+    MCAudioInputQueue *_recorder;
     BOOL _started;
     
     NSMutableData *_data;
@@ -27,9 +29,32 @@
 
 @implementation ViewController
 
+#pragma mark - init & dealloc
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self)
+    {
+        [self commonInit];
+    }
+    return self;
+}
+
 - (void)awakeFromNib
 {
     [super awakeFromNib];
+    
+    [self commonInit];
+}
+
+- (void)commonInit
+{
+    if (_inited)
+    {
+        return;
+    }
+    
+    _inited = YES;
     
     _format.mFormatID = kAudioFormatLinearPCM;
     _format.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
