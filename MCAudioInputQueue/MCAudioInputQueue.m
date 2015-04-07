@@ -33,13 +33,18 @@ const int MCAudioQueueBufferCount = 3;
 @dynamic available;
 
 #pragma mark - init & dealloc
-+ (instancetype)queueWithFormat:(AudioStreamBasicDescription)format bufferDuration:(NSTimeInterval)bufferDuration delegate:(id<MCAudioInputQueueDelegate>)delegate
++ (instancetype)inputQueueWithFormat:(AudioStreamBasicDescription)format bufferDuration:(NSTimeInterval)bufferDuration delegate:(id<MCAudioInputQueueDelegate>)delegate
 {
     return [[self alloc] initWithFormat:format bufferDuration:bufferDuration delegate:delegate];
 }
 
 - (instancetype)initWithFormat:(AudioStreamBasicDescription)format bufferDuration:(NSTimeInterval)bufferDuration delegate:(id<MCAudioInputQueueDelegate>)delegate
 {
+    if (bufferDuration <= 0)
+    {
+        return nil;
+    }
+    
     self = [super init];
     if (self)
     {

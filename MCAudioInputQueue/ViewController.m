@@ -25,6 +25,7 @@
 }
 @property (nonatomic,strong) IBOutlet UIButton *startOrStopButton;
 @property (nonatomic,strong) IBOutlet UIButton *playButton;
+@property (nonatomic,strong) IBOutlet UILabel  *durationLabel;
 @end
 
 @implementation ViewController
@@ -144,7 +145,7 @@
     _started = YES;
     
     _data = [NSMutableData data];
-    _recorder = [[MCAudioInputQueue alloc] initWithFormat:_format bufferDuration:0.2 delegate:self];
+    _recorder = [MCAudioInputQueue inputQueueWithFormat:_format bufferDuration:0.2 delegate:self];
     [_recorder start];
     
     [self _refreshUI];
@@ -179,6 +180,12 @@
     {
         [_data appendData:data];
     }
+    
+    double duration = _data.length / _recorder.bufferSize * _recorder.bufferDuration;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.durationLabel.text = [NSString stringWithFormat:@"duration = %.2lf",duration];
+    });
 }
 
 - (void)inputQueue:(MCAudioInputQueue *)inputQueue errorOccur:(NSError *)error

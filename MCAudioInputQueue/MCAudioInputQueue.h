@@ -25,8 +25,16 @@
 @property (nonatomic,assign,readonly) NSTimeInterval bufferDuration;
 @property (nonatomic,assign,readonly) UInt32 bufferSize;
 
-+ (instancetype)queueWithFormat:(AudioStreamBasicDescription)format bufferDuration:(NSTimeInterval)bufferDuration delegate:(id<MCAudioInputQueueDelegate>)delegate;
-- (instancetype)initWithFormat:(AudioStreamBasicDescription)format bufferDuration:(NSTimeInterval)bufferDuration delegate:(id<MCAudioInputQueueDelegate>)delegate;
+/**
+ *  create input queue
+ *
+ *  @param format         audio format
+ *  @param bufferDuration duration per buffer block
+ *  @param delegate       delegate
+ *
+ *  @return input queue instance
+ */
++ (instancetype)inputQueueWithFormat:(AudioStreamBasicDescription)format bufferDuration:(NSTimeInterval)bufferDuration delegate:(id<MCAudioInputQueueDelegate>)delegate;
 
 - (BOOL)start;
 - (BOOL)pause;
