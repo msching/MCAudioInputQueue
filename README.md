@@ -29,7 +29,7 @@ format.mBytesPerPacket = _format.mBytesPerFrame = (_format.mBitsPerChannel / 8) 
 format.mFramesPerPacket = 1;
 format.mSampleRate = 8000.0f;
 
-_recorder = [[MCAudioInputQueue alloc] initWithFormat:format bufferDuration:0.2 delegate:self];
+_recorder = [MCAudioInputQueue inputQueueWithFormat:format bufferDuration:0.2 delegate:self];
 [_recorder start];
 ```
 
