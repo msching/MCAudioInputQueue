@@ -62,7 +62,7 @@ static const NSTimeInterval bufferDuration = 0.2;
     _format.mFormatID = kAudioFormatLinearPCM;
     _format.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
     _format.mBitsPerChannel = 16;
-    _format.mChannelsPerFrame = 1;
+    _format.mChannelsPerFrame = 2;
     _format.mBytesPerPacket = _format.mBytesPerFrame = (_format.mBitsPerChannel / 8) * _format.mChannelsPerFrame;
     _format.mFramesPerPacket = 1;
     _format.mSampleRate = 8000.0f;
@@ -151,6 +151,7 @@ static const NSTimeInterval bufferDuration = 0.2;
     
     _data = [NSMutableData data];
     _recorder = [MCAudioInputQueue inputQueueWithFormat:_format bufferDuration:bufferDuration delegate:self];
+    _recorder.meteringEnabled = YES;
     [_recorder start];
     
     [self _refreshUI];
@@ -185,6 +186,10 @@ static const NSTimeInterval bufferDuration = 0.2;
     {
         [_data appendData:data];
     }
+    
+    [inputQueue updateMeters];
+    NSLog(@"channel 0 averagePower = %lf, peakPower = %lf",[inputQueue averagePowerForChannel:0],[inputQueue peakPowerForChannel:0]);
+    NSLog(@"channel 1 averagePower = %lf, peakPower = %lf",[inputQueue averagePowerForChannel:1],[inputQueue peakPowerForChannel:1]);
     
     double duration = _data.length / _recorder.bufferSize * _recorder.bufferDuration;
     

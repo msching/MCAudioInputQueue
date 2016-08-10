@@ -20,6 +20,8 @@ const int MCAudioQueueBufferCount = 3;
     BOOL _isRunning;
     UInt32 _bufferSize;
     NSMutableData *_buffer;
+    
+    AudioQueueLevelMeterState *_meterStateDB;
 }
 @end
 
@@ -54,8 +56,11 @@ const int MCAudioQueueBufferCount = 3;
         _bufferSize = _format.mBitsPerChannel * _format.mChannelsPerFrame * _format.mSampleRate * _bufferDuration / 8;
         _buffer = [[NSMutableData alloc] init];
         
+        _meterStateDB = malloc(sizeof(AudioQueueLevelMeterState) * _format.mChannelsPerFrame);
+        
         _delegate = delegate;
         [self _createAudioInputQueue];
+        [self _updateMeteringEnabled];
     }
     return self;
 }
@@ -63,6 +68,7 @@ const int MCAudioQueueBufferCount = 3;
 
 - (void)dealloc
 {
+    free(_meterStateDB);
     [self _disposeAudioOutputQueue];
 }
 
@@ -159,6 +165,47 @@ const int MCAudioQueueBufferCount = 3;
     return _audioQueue != NULL;
 }
 
+#pragma mark - metering
+- (void)_updateMeteringEnabled
+{
+    UInt32 size = sizeof(UInt32);
+    UInt32 enabledLevelMeter = 0;
+    [self getProperty:kAudioQueueProperty_EnableLevelMetering dataSize:&size data:&enabledLevelMeter error:nil];
+    _meteringEnabled = enabledLevelMeter == 0 ? NO : YES;
+}
+
+- (void)setMeteringEnabled:(BOOL)meteringEnabled
+{
+    _meteringEnabled = meteringEnabled;
+    UInt32 enabledLevelMeter = _meteringEnabled ? 1 : 0;
+    [self setProperty:kAudioQueueProperty_EnableLevelMetering dataSize:sizeof(UInt32) data:&enabledLevelMeter error:nil];
+}
+
+- (void)updateMeters
+{
+    UInt32 size = sizeof(AudioQueueLevelMeterState) * _format.mChannelsPerFrame;
+    [self getProperty:kAudioQueueProperty_CurrentLevelMeterDB dataSize:&size data:_meterStateDB error:nil];
+}
+
+- (float)peakPowerForChannel:(NSUInteger)channelNumber
+{
+    if (channelNumber >= _format.mChannelsPerFrame)
+    {
+        return -160.0f;
+    }
+    return _meterStateDB[channelNumber].mPeakPower;
+}
+
+- (float)averagePowerForChannel:(NSUInteger)channelNumber
+{
+    if (channelNumber >= _format.mChannelsPerFrame)
+    {
+        return -160.0f;
+    }
+    return _meterStateDB[channelNumber].mAveragePower;
+}
+
+#pragma mark - property & paramters
 - (BOOL)setProperty:(AudioQueuePropertyID)propertyID dataSize:(UInt32)dataSize data:(const void *)data error:(NSError *__autoreleasing *)outError
 {
     OSStatus status = AudioQueueSetProperty(_audioQueue, propertyID, data, dataSize);
@@ -169,6 +216,13 @@ const int MCAudioQueueBufferCount = 3;
 - (BOOL)getProperty:(AudioQueuePropertyID)propertyID dataSize:(UInt32 *)dataSize data:(void *)data error:(NSError *__autoreleasing *)outError
 {
     OSStatus status = AudioQueueGetProperty(_audioQueue, propertyID, data, dataSize);
+    [self _errorForOSStatus:status error:outError];
+    return status == noErr;
+}
+
+- (BOOL)getPropertySize:(AudioQueuePropertyID)propertyID dataSize:(UInt32 *)dataSize error:(NSError *__autoreleasing *)outError
+{
+    OSStatus status = AudioQueueGetPropertySize(_audioQueue, propertyID, dataSize);
     [self _errorForOSStatus:status error:outError];
     return status == noErr;
 }
